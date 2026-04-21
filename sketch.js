@@ -39,7 +39,27 @@ function draw() {
 
   // --- 在 pg 上繪製你要疊加的內容 ---
   pg.clear(); // 重要：每一幀都清除背景，保持圖層透明
-  
+
+  // 載入攝影機的像素資料以供讀取
+  capture.loadPixels();
+  if (capture.pixels.length > 0) {
+    let step = 20; // 設定馬賽克區塊的長寬為 20 單位
+    pg.noStroke(); // 不要繪製方塊邊框
+
+    for (let y = 0; y < capture.height; y += step) {
+      for (let x = 0; x < capture.width; x += step) {
+        let index = (y * capture.width + x) * 4;
+        let r = capture.pixels[index];
+        let g = capture.pixels[index + 1];
+        let b = capture.pixels[index + 2];
+        
+        let gray = (r + g + b) / 3; // 計算 RGB 的平均值，取得灰階數字
+        
+        pg.fill(gray); // 設定該單位的顏色為算出的灰階值
+        pg.rect(x, y, step, step); // 畫出 20x20 的馬賽克方塊
+      }
+    }
+  }
   // -----------------------------
 
   // 解決左右顛倒的問題：利用 push/pop 隔離畫布變形狀態
